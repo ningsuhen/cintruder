@@ -77,11 +77,15 @@ class CIntruderOCR(object):
 
         letters = []
 
-        for y in range(im2.size[0]): 
+        for y in range(im2.size[0]):
+            pixelCount = 0
             for x in range(im2.size[1]): 
                 pix = im2.getpixel((y, x))
                 if pix != 255:
-                    inletter = True
+                    pixelCount += 1
+
+            if pixelCount > 1:
+                inletter = True
 
             if foundletter == False and inletter == True:
                 foundletter = True

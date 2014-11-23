@@ -23,8 +23,8 @@ Franklin St,  Fifth Floor,  Boston,  MA  02110-1301  USA
 from PIL import Image
 import hashlib, os, math, time
 
-class VectorCompare:
 
+class VectorCompare:
     def magnitude(self, concordance):
         total = 0
         for word, count in concordance.iteritems():
@@ -39,10 +39,12 @@ class VectorCompare:
                 topvalue += count * concordance2[word]
         return topvalue / (self.magnitude(concordance1) * self.magnitude(concordance2))
 
+
 class CIntruderCrack(object):
     """
     Class to bruteforce captchas
     """
+
     def __init__(self, captcha=""):
         """
         Initialize main CIntruder
@@ -64,26 +66,27 @@ class CIntruderCrack(object):
         """
         self.captcha = captcha
         return captcha
- 
+
     def crack(self, options):
         v = VectorCompare()
-        iconset = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+        iconset = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+                   'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
         imageset = []
         last_letter = None
         print "Loading dictionary... "
         for letter in iconset:
-            for img in os.listdir('iconset/%s/'%(letter)):
+            for img in os.listdir('iconset/%s/' % (letter)):
                 temp = []
-                if img != "Thumbs.db": # win32 check
+                if img != "Thumbs.db":  # win32 check
                     if options.verbose:
                         if last_letter != letter:
                             print "-----------------"
-                            print "Word:", letter 
+                            print "Word:", letter
                             print "-----------------"
                         print img
-                        last_letter = letter           
-                    temp.append(self.buildvector(Image.open("iconset/%s/%s"%(letter, img))))
-                imageset.append({letter:temp})
+                        last_letter = letter
+                    temp.append(self.buildvector(Image.open("iconset/%s/%s" % (letter, img))))
+                imageset.append({letter: temp})
 
         try:
             im = Image.open(self.captcha)
@@ -98,19 +101,25 @@ class CIntruderCrack(object):
             for y in range(im.size[0]):
                 pix = im.getpixel((y, x))
                 temp[pix] = pix
-                if pix == 3: # pixel colour id 
+                if pix == 3:  # pixel colour id
                     im2.putpixel((y, x), 0)
-    
+
         inletter = False
         foundletter = False
         start = 0
         end = 0
         letters = []
-        for y in range(im2.size[0]): # slice across
-            for x in range(im2.size[1]): # slice down
+        for y in range(im2.size[0]):  # slice across
+            pixelCount = 0
+            for x in range(im2.size[1]):  # slice down
                 pix = im2.getpixel((y, x))
                 if pix != 255:
-                    inletter = True
+                    print "------------------------>"
+                    pixelCount += 1
+
+            if pixelCount > 1:
+
+                inletter = True
 
             if foundletter == False and inletter == True:
                 foundletter = True
@@ -165,6 +174,6 @@ class CIntruderCrack(object):
         print "==================\n"
         return word_sug
 
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    print "===================================="
 #    print "Captcha Cracked:",":-)\n"
